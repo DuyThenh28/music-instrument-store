@@ -39,6 +39,7 @@ export default function RootLayout({
             <a href="/">Trang Chủ</a>
             <a href="/products">Sản Phẩm</a>
             <a href="/cart">Giỏ Hàng</a>
+            <a href="/orders">Đơn Đã Mua</a>
             <a href="/login">Đăng Nhập</a>
             <a href="/register">Đăng Ký</a>
             <a href="/admin">Admin</a>

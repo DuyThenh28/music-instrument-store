@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 const products = [
+  // ALTO SAXOPHONE
   {
     id: 1,
     name: "Yamaha YAS-280",
@@ -22,12 +23,14 @@ const products = [
   },
   {
     id: 3,
-    name: "Conn Director",
+    name: "Conn AS650",
     brand: "Conn",
     type: "Alto Saxophone",
     price: 12000000,
     image: "/images/conn-as650.jpg",
   },
+
+  // TENOR SAXOPHONE
   {
     id: 4,
     name: "Yamaha YTS-280",
@@ -38,90 +41,76 @@ const products = [
   },
   {
     id: 5,
-    name: "Selmer Supreme",
-    brand: "Selmer",
-    type: "Professional Saxophone",
-    price: 95000000,
-    image: "/images/selmer-supreme.jpg",
-  },
-  {
-    id: 6,
-    name: "Conn New Wonder",
-    brand: "Conn",
-    type: "Vintage Saxophone",
-    price: 28000000,
-    image: "/images/conn-newwoner.jpg",
-  },
-
-  {
-    id: 7,
     name: "Selmer TS400",
     brand: "Selmer",
     type: "Tenor Saxophone",
-    price: 56000000,
+    price: 58000000,
     image: "/images/selmer-ts400.jpg",
   },
   {
-    id: 8,
-    name: "Jupiter JTS-700",
+    id: 6,
+    name: "Jupiter JTS700",
     brand: "Jupiter",
     type: "Tenor Saxophone",
-    price: 38000000,
+    price: 35000000,
     image: "/images/jupiter-jts700.jpg",
   },
 
+  // SOPRANO SAXOPHONE
   {
-    id: 9,
-    name: "Yamaha YSS-475",
+    id: 7,
+    name: "Yamaha YSS475",
     brand: "Yamaha",
     type: "Soprano Saxophone",
-    price: 72000000,
+    price: 56000000,
     image: "/images/yamaha-yss475.jpg",
   },
   {
-    id: 10,
+    id: 8,
     name: "Yanagisawa S901",
     brand: "Yanagisawa",
     type: "Soprano Saxophone",
-    price: 68000000,
+    price: 72000000,
     image: "/images/yanagisawa-s901.jpg",
   },
   {
-    id: 11,
-    name: "Jupiter JSS-1000",
+    id: 9,
+    name: "Jupiter JSS1000",
     brand: "Jupiter",
     type: "Soprano Saxophone",
-    price: 45000000,
+    price: 39000000,
     image: "/images/jupiter-jss1000.jpg",
   },
 
+  // MOUTHPIECE
   {
-    id: 12,
+    id: 10,
     name: "Yamaha 4C Mouthpiece",
     brand: "Yamaha",
     type: "Mouthpiece",
-    price: 950000,
+    price: 1200000,
     image: "/images/yamaha-4c-mouthpiece.jpg",
   },
   {
-    id: 13,
-    name: "Selmer S80 C* Mouthpiece",
+    id: 11,
+    name: "Selmer S80 Mouthpiece",
     brand: "Selmer",
     type: "Mouthpiece",
-    price: 4200000,
+    price: 2500000,
     image: "/images/selmer-s80-mouthpiece.jpg",
   },
   {
-    id: 14,
+    id: 12,
     name: "Vandoren AL3 Mouthpiece",
     brand: "Vandoren",
     type: "Mouthpiece",
-    price: 3600000,
+    price: 2800000,
     image: "/images/vandoren-al3-mouthpiece.jpg",
   },
 
+  // PHỤ KIỆN
   {
-    id: 15,
+    id: 13,
     name: "Dây Đeo Saxophone",
     brand: "Yamaha",
     type: "Phụ Kiện",
@@ -129,21 +118,94 @@ const products = [
     image: "/images/day-deo-saxophone.jpg",
   },
   {
-    id: 16,
-    name: "Kèn Reed Alto Saxophone",
-    brand: "Vandoren",
-    type: "Phụ Kiện",
-    price: 650000,
-    image: "/images/reed-alto-saxophone.jpg",
-  },
-  {
-    id: 17,
+    id: 14,
     name: "Bộ Vệ Sinh Saxophone",
-    brand: "Yamaha",
+    brand: "Conn",
     type: "Phụ Kiện",
-    price: 480000,
+    price: 450000,
     image: "/images/bo-ve-sinh-saxophone.jpg",
   },
+  {
+    id: 15,
+    name: "Reed Alto Saxophone",
+    brand: "Vandoren",
+    type: "Phụ Kiện",
+    price: 250000,
+    image: "/images/reed-alto-saxophone.jpg",
+  },
+  // YAMAHA
+{
+  id: 16,
+  name: "Yamaha YSS-475",
+  brand: "Yamaha",
+  type: "Soprano Saxophone",
+  price: 56000000,
+  image: "/images/yamaha-yss475.jpg",
+},
+{
+  id: 17,
+  name: "Yamaha 4C Mouthpiece",
+  brand: "Yamaha",
+  type: "Mouthpiece",
+  price: 1200000,
+  image: "/images/yamaha-4c-mouthpiece.jpg",
+},
+
+// SELMER
+{
+  id: 18,
+  name: "Selmer Supreme",
+  brand: "Selmer",
+  type: "Alto Saxophone",
+  price: 95000000,
+  image: "/images/selmer-supreme.jpg",
+},
+
+// CONN
+{
+  id: 19,
+  name: "Conn New Wonder",
+  brand: "Conn",
+  type: "Tenor Saxophone",
+  price: 28000000,
+  image: "/images/conn-newwoner.jpg",
+},
+
+// YANAGISAWA
+{
+  id: 20,
+  name: "Yanagisawa AWO1",
+  brand: "Yanagisawa",
+  type: "Alto Saxophone",
+  price: 68000000,
+  image: "/images/yanagisawa-awo1.jpg",
+},
+{
+  id: 21,
+  name: "Yanagisawa AWO1 Pro",
+  brand: "Yanagisawa",
+  type: "Alto Saxophone",
+  price: 73000000,
+  image: "/images/yanagisawa-awo1-1.jpg",
+},
+
+// JUPITER
+{
+  id: 22,
+  name: "Jupiter JAS700",
+  brand: "Jupiter",
+  type: "Alto Saxophone",
+  price: 31000000,
+  image: "/images/jupiter-jas700.jpg",
+},
+{
+  id: 23,
+  name: "Jupiter JAS700 Pro",
+  brand: "Jupiter",
+  type: "Alto Saxophone",
+  price: 34000000,
+  image: "/images/jupiter-jas700-1.jpg",
+},
 ];
 
 const categoryItems = [
@@ -222,12 +284,12 @@ export default function Home() {
     });
 
     if (sort === "low-high") {
-      result = [...result].sort((a, b) => a.price - b.price);
-    }
+  result = [...result].sort((a, b) => a.price - b.price);
+}
 
-    if (sort === "high-low") {
-      result = [...result].sort((a, b) => b.price - a.price);
-    }
+if (sort === "high-low") {
+  result = [...result].sort((a, b) => b.price - a.price);
+}
 
     return result;
   }, [search, brand, sort, category]);
@@ -318,17 +380,31 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="brand-section">
-        <h2>Thương Hiệu Nổi Bật</h2>
+     <section className="brand-section">
+  <h2>Thương Hiệu Nổi Bật</h2>
 
-        <div className="brand-logo-grid">
-          {brands.map((item) => (
-            <div className="brand-logo-card" key={item.name}>
-              <img src={item.image} alt={item.name} />
-            </div>
-          ))}
-        </div>
-      </section>
+  <div className="brand-logo-grid">
+    {brands.map((item) => (
+      <button
+        key={item.name}
+        type="button"
+        className="brand-logo-card"
+        onClick={() => {
+          setBrand(item.name);
+          setCategory("all");
+
+          setTimeout(() => {
+            document
+              .getElementById("product-list")
+              ?.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+        }}
+      >
+        <img src={item.image} alt={item.name} />
+      </button>
+    ))}
+  </div>
+</section>
 
       <section className="why-section">
         <h2>Tại Sao Chọn Chúng Tôi</h2>
@@ -373,9 +449,6 @@ export default function Home() {
           <option value="Yamaha">Yamaha</option>
           <option value="Selmer">Selmer</option>
           <option value="Conn">Conn</option>
-          <option value="Jupiter">Jupiter</option>
-          <option value="Yanagisawa">Yanagisawa</option>
-          <option value="Vandoren">Vandoren</option>
         </select>
 
         <select value={sort} onChange={(e) => setSort(e.target.value)}>

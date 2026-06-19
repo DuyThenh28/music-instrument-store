@@ -1,67 +1,169 @@
+"use client";
+
 import Link from "next/link";
 
 const products = [
   {
     id: 1,
     name: "Yamaha YAS-280",
+    brand: "Yamaha",
     type: "Alto Saxophone",
-    price: "35.800.000đ",
+    price: 35800000,
     image: "/images/yamaha-yas280.jpg",
   },
   {
     id: 2,
     name: "Selmer AS500",
+    brand: "Selmer",
     type: "Alto Saxophone",
-    price: "51.000.000đ",
+    price: 51000000,
     image: "/images/selmer-as500.jpg",
   },
   {
     id: 3,
-    name: "Conn Director",
+    name: "Conn AS650",
+    brand: "Conn",
     type: "Alto Saxophone",
-    price: "12.000.000đ",
+    price: 12000000,
     image: "/images/conn-as650.jpg",
   },
+
+  // TENOR SAXOPHONE
   {
     id: 4,
     name: "Yamaha YTS-280",
+    brand: "Yamaha",
     type: "Tenor Saxophone",
-    price: "42.000.000đ",
+    price: 42000000,
     image: "/images/yamaha-yts280.jpg",
   },
   {
     id: 5,
-    name: "Selmer Supreme",
-    type: "Professional Saxophone",
-    price: "95.000.000đ",
-    image: "/images/selmer-supreme.jpg",
+    name: "Selmer TS400",
+    brand: "Selmer",
+    type: "Tenor Saxophone",
+    price: 58000000,
+    image: "/images/selmer-ts400.jpg",
   },
   {
     id: 6,
-    name: "Conn New Wonder",
-    type: "Vintage Saxophone",
-    price: "28.000.000đ",
-    image: "/images/conn-newwoner.jpg",
+    name: "Jupiter JTS700",
+    brand: "Jupiter",
+    type: "Tenor Saxophone",
+    price: 35000000,
+    image: "/images/jupiter-jts700.jpg",
   },
+
+  // SOPRANO SAXOPHONE
   {
     id: 7,
-    name: "Yanagisawa A-WO1",
-    type: "Alto Saxophone",
-    price: "72.000.000đ",
-    image: "/images/yanagisawa-awo1.jpg",
+    name: "Yamaha YSS475",
+    brand: "Yamaha",
+    type: "Soprano Saxophone",
+    price: 56000000,
+    image: "/images/yamaha-yss475.jpg",
   },
   {
     id: 8,
-    name: "Jupiter JAS700",
-    type: "Student Saxophone",
-    price: "24.500.000đ",
-    image: "/images/jupiter-jas700.jpg",
+    name: "Yanagisawa S901",
+    brand: "Yanagisawa",
+    type: "Soprano Saxophone",
+    price: 72000000,
+    image: "/images/yanagisawa-s901.jpg",
+  },
+  {
+    id: 9,
+    name: "Jupiter JSS1000",
+    brand: "Jupiter",
+    type: "Soprano Saxophone",
+    price: 39000000,
+    image: "/images/jupiter-jss1000.jpg",
+  },
+
+  // MOUTHPIECE
+  {
+    id: 10,
+    name: "Yamaha 4C Mouthpiece",
+    brand: "Yamaha",
+    type: "Mouthpiece",
+    price: 1200000,
+    image: "/images/yamaha-4c-mouthpiece.jpg",
+  },
+  {
+    id: 11,
+    name: "Selmer S80 Mouthpiece",
+    brand: "Selmer",
+    type: "Mouthpiece",
+    price: 2500000,
+    image: "/images/selmer-s80-mouthpiece.jpg",
+  },
+  {
+    id: 12,
+    name: "Vandoren AL3 Mouthpiece",
+    brand: "Vandoren",
+    type: "Mouthpiece",
+    price: 2800000,
+    image: "/images/vandoren-al3-mouthpiece.jpg",
+  },
+
+  // PHỤ KIỆN
+  {
+    id: 13,
+    name: "Dây Đeo Saxophone",
+    brand: "Yamaha",
+    type: "Phụ Kiện",
+    price: 350000,
+    image: "/images/day-deo-saxophone.jpg",
+  },
+  {
+    id: 14,
+    name: "Bộ Vệ Sinh Saxophone",
+    brand: "Conn",
+    type: "Phụ Kiện",
+    price: 450000,
+    image: "/images/bo-ve-sinh-saxophone.jpg",
+  },
+  {
+    id: 15,
+    name: "Reed Alto Saxophone",
+    brand: "Vandoren",
+    type: "Phụ Kiện",
+    price: 250000,
+    image: "/images/reed-alto-saxophone.jpg",
   },
 ];
 
-export default function Products() {
+const categoryItems = [
+  {
+    name: "Alto Saxophone",
+    image: "/images/yamaha-yas280.jpg",
+    value: "Alto Saxophone",
+  },
+  {
+    name: "Tenor Saxophone",
+    image: "/images/yamaha-yts280.jpg",
+    value: "Tenor Saxophone",
+  },
+  {
+    name: "Soprano Saxophone",
+    image: "/images/selmer-as500.jpg",
+    value: "Soprano Saxophone",
+  },
+  {
+    name: "Mouthpiece",
+    image: "/images/mouthpiece.jpg",
+    value: "Mouthpiece",
+  },
+  {
+    name: "Phụ Kiện",
+    image: "/images/accessory.jpg",
+    value: "Phụ Kiện",
+  },
+];
+
+export default function ProductsPage() {
   return (
-    <main className="products-page">
+    <main>
       <h1 className="section-title">Danh Sách Sản Phẩm</h1>
 
       <section className="products">
@@ -73,7 +175,9 @@ export default function Products() {
 
             <h3>{product.name}</h3>
 
-            <p className="price">{product.price}</p>
+            <p className="price">
+              {product.price.toLocaleString("vi-VN")}đ
+            </p>
 
             <Link href={`/product/${product.id}`}>
               <button>Xem Chi Tiết</button>
