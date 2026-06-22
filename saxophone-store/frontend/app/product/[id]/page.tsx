@@ -903,10 +903,58 @@ export default function ProductDetail() {
                 </div>
               </div>
             )}
+            
 
             {activeTab === "specs" && (
               <div className="yamaha-tab-content">
                 <h2>Thông số kỹ thuật</h2>
+                <div className="product-long-detail">
+  <h2>Chi Tiết Sản Phẩm</h2>
+
+  <h3>{product.name}</h3>
+
+  <p>
+    {product.name} là dòng Saxophone được thiết kế dành cho người mới học,
+    học sinh âm nhạc và người chơi bán chuyên. Kèn sở hữu âm thanh sáng,
+    dễ kiểm soát cùng hệ thống phím bấm nhẹ giúp việc luyện tập trở nên
+    hiệu quả hơn.
+  </p>
+
+  <h3>Thiết Kế Chuyên Nghiệp</h3>
+
+  <p>
+    Thân kèn được chế tạo từ đồng thau chất lượng cao với lớp sơn vàng bóng,
+    mang lại vẻ ngoài sang trọng và độ bền cao. Các chi tiết được gia công
+    chính xác giúp tăng độ ổn định trong quá trình sử dụng.
+  </p>
+
+  <h3>Âm Thanh Ấn Tượng</h3>
+
+  <p>
+    Âm sắc sáng, rõ nét và cân bằng giúp người chơi dễ dàng luyện tập
+    từ các bài cơ bản đến nâng cao. Khả năng phản hồi hơi tốt giúp việc
+    kiểm soát âm thanh trở nên dễ dàng hơn.
+  </p>
+
+  <h3>Phù Hợp Nhiều Đối Tượng</h3>
+
+  <p>
+    Sản phẩm phù hợp với học sinh, sinh viên âm nhạc, người mới bắt đầu
+    học Saxophone cũng như những người chơi muốn sở hữu một cây kèn có
+    chất lượng ổn định với mức giá hợp lý.
+  </p>
+
+  <h3>Thông Tin Nổi Bật</h3>
+
+  <ul>
+    <li>Thương hiệu: {product.brand}</li>
+    <li>Loại kèn: {product.type}</li>
+    <li>Xuất xứ: Nhật Bản</li>
+    <li>Bảo hành: 24 tháng</li>
+    <li>Âm thanh sáng, dễ kiểm soát</li>
+    <li>Thiết kế bền bỉ cho luyện tập hằng ngày</li>
+  </ul>
+</div>
 
                 <div className="yamaha-spec-table">
                   {Object.entries(product.specs).map(([key, value]) => (
@@ -918,6 +966,7 @@ export default function ProductDetail() {
                 </div>
               </div>
             )}
+            
 
             {activeTab === "download" && (
               <div className="yamaha-tab-content">
@@ -932,6 +981,43 @@ export default function ProductDetail() {
                 </button>
               </div>
             )}
+            <section className="buy-info-section">
+  <h3>Cách Mua Hàng</h3>
+
+  <p>
+    Quý khách đặt hàng tại website và điền đầy đủ thông tin: Họ tên,
+    số điện thoại, địa chỉ. Shop sẽ liên hệ lại để xác nhận và giao hàng.
+  </p>
+
+  <h4>Cách 1: Đặt hàng trực tiếp trên website</h4>
+  <ul>
+    <li>Chọn sản phẩm yêu thích</li>
+    <li>Bấm “Thêm vào giỏ hàng”</li>
+    <li>Vào giỏ hàng và nhập thông tin nhận hàng</li>
+  </ul>
+
+  <h4>Cách 2: Liên hệ tư vấn</h4>
+  <ul>
+    <li>Hotline/Zalo: 0912 19 12 18</li>
+    <li>Hỗ trợ tư vấn chọn kèn phù hợp cho người mới học</li>
+  </ul>
+
+  <details>
+    <summary>Lý Do Nên Mua Hàng Tại NhomTTTN Music</summary>
+    <p>
+      Sản phẩm chính hãng, hình ảnh rõ ràng, tư vấn tận tình, hỗ trợ kiểm tra
+      hàng trước khi nhận và bảo hành theo từng sản phẩm.
+    </p>
+  </details>
+
+  <details>
+    <summary>Đánh Giá Của Khách Hàng</summary>
+    <p>
+      Nhiều khách hàng đánh giá cao chất lượng âm thanh, thiết kế đẹp và dịch vụ
+      hỗ trợ nhanh chóng của cửa hàng.
+    </p>
+  </details>
+</section>
 
             <div className="product-detail-actions">
               <button onClick={handleAddToCart}>Thêm Vào Giỏ Hàng</button>
@@ -941,6 +1027,28 @@ export default function ProductDetail() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="related-section">
+        <h2>Sản Phẩm Liên Quan</h2>
+
+        <div className="related-grid">
+          {products
+            .filter((item) => item.id !== product.id)
+.slice(0, 8)
+            .map((item) => (
+              <Link
+                href={`/product/${item.id}`}
+                className="related-card"
+                key={item.id}
+              >
+                <img src={item.image} alt={item.name} />
+                <p className="related-brand">{item.brand}</p>
+                <h3>{item.name}</h3>
+                <p className="related-price">{item.price}</p>
+              </Link>
+            ))}
         </div>
       </section>
 

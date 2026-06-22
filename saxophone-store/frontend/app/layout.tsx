@@ -1,11 +1,12 @@
 import "./globals.css";
 import { CartProvider } from "./context/CartContext";
 import CartButton from "./components/CartButton";
+import ChatWidget from "./components/ChatWidget";
 import { Poppins } from "next/font/google";
 import Link from "next/link";
 
 const poppins = Poppins({
-  subsets: ["latin", "vietnamese"],
+  subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
@@ -52,6 +53,8 @@ export default function RootLayout({
 
           {children}
 
+          <ChatWidget />
+
           <footer className="footer">
             <div className="footer-container">
               <div className="footer-column">
@@ -81,26 +84,24 @@ export default function RootLayout({
               <div className="footer-column">
                 <h3>Kết Nối</h3>
                 <div className="social-icons">
-  <a
-    href="https://www.facebook.com/tran.thien.208979/"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Facebook
-  </a>
+                  <a
+                    href="https://www.facebook.com/tran.thien.208979/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Facebook
+                  </a>
 
-  <a
-    href="https://zalo.me/0912191218"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Zalo
-  </a>
+                  <a
+                    href="https://zalo.me/0912191218"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Zalo
+                  </a>
 
-  <a href="mailto:support@nhomtttnmusic.vn">
-    Email
-  </a>
-</div>
+                  <a href="mailto:support@nhomtttnmusic.vn">Email</a>
+                </div>
               </div>
             </div>
 
