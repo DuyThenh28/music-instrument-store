@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 export default function Cart() {
   const [cart, setCart] = useState<any[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const [customer, setCustomer] = useState({
     name: "",
@@ -17,16 +19,41 @@ export default function Cart() {
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(data);
+    setSelectedItems(data.map((_: any, index: number) => index));
   }, []);
 
   const saveCart = (newCart: any[]) => {
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart));
+
+    setSelectedItems((prev) =>
+      prev.filter((index) => index < newCart.length)
+    );
   };
 
   const getPriceNumber = (price: string) => {
     return Number(String(price).replaceAll(".", "").replace("đ", ""));
   };
+
+  const toggleSelectItem = (index: number) => {
+    if (selectedItems.includes(index)) {
+      setSelectedItems(selectedItems.filter((i) => i !== index));
+    } else {
+      setSelectedItems([...selectedItems, index]);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedItems.length === cart.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(cart.map((_, index) => index));
+    }
+  };
+
+  const selectedCart = cart.filter((_, index) =>
+    selectedItems.includes(index)
+  );
 
   const increaseQuantity = (index: number) => {
     const newCart = [...cart];
@@ -40,6 +67,8 @@ export default function Cart() {
     if ((newCart[index].quantity || 1) > 1) {
       newCart[index].quantity -= 1;
     } else {
+      const ok = confirm("Bạn có muốn xóa sản phẩm này khỏi giỏ hàng không?");
+      if (!ok) return;
       newCart.splice(index, 1);
     }
 
@@ -47,61 +76,84 @@ export default function Cart() {
   };
 
   const removeItem = (index: number) => {
+    const ok = confirm("Bạn chắc chắn muốn xóa sản phẩm này?");
+    if (!ok) return;
+
     const newCart = [...cart];
     newCart.splice(index, 1);
     saveCart(newCart);
   };
 
   const clearCart = () => {
+    const ok = confirm("Bạn chắc chắn muốn xóa toàn bộ giỏ hàng?");
+    if (!ok) return;
+
     saveCart([]);
+    setSelectedItems([]);
   };
 
-  const totalItems = cart.reduce(
+  const totalItems = selectedCart.reduce(
     (sum, item) => sum + (item.quantity || 1),
     0
   );
 
-  const totalPrice = cart.reduce(
+  const totalPrice = selectedCart.reduce(
     (sum, item) =>
       sum + getPriceNumber(item.price) * (item.quantity || 1),
     0
   );
 
   const confirmOrder = () => {
-  if (!customer.name || !customer.phone || !customer.address) {
-    alert("Vui lòng nhập đầy đủ họ tên, số điện thoại và địa chỉ");
-    return;
-  }
+    if (selectedItems.length === 0) {
+      alert("Vui lòng chọn ít nhất 1 sản phẩm để thanh toán");
+      return;
+    }
 
-  const oldOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+    if (!customer.name || !customer.phone || !customer.address) {
+      alert("Vui lòng nhập đầy đủ họ tên, số điện thoại và địa chỉ");
+      return;
+    }
 
-  const newOrder = {
-    id: "DH" + Date.now(),
-    customer,
-    products: cart,
-    totalItems,
-    totalPrice,
-    status: "Chờ xác nhận",
-    createdAt: new Date().toLocaleString("vi-VN"),
+    if (!paymentMethod) {
+      alert("Vui lòng chọn phương thức thanh toán");
+      return;
+    }
+
+    const oldOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+
+    const newOrder = {
+      id: "DH" + Date.now(),
+      customer,
+      paymentMethod,
+      products: selectedCart,
+      totalItems,
+      totalPrice,
+      status: "Chờ xác nhận",
+      createdAt: new Date().toLocaleString("vi-VN"),
+    };
+
+    localStorage.setItem(
+      "orders",
+      JSON.stringify([newOrder, ...oldOrders])
+    );
+
+    const remainingCart = cart.filter(
+      (_, index) => !selectedItems.includes(index)
+    );
+
+    setShowCheckout(false);
+    saveCart(remainingCart);
+    setSelectedItems([]);
+
+    setCustomer({
+      name: "",
+      phone: "",
+      address: "",
+      note: "",
+    });
+
+    window.location.href = "/orders";
   };
-
-  localStorage.setItem(
-    "orders",
-    JSON.stringify([newOrder, ...oldOrders])
-  );
-
-  setShowCheckout(false);
-  clearCart();
-
-  setCustomer({
-    name: "",
-    phone: "",
-    address: "",
-    note: "",
-  });
-
-  window.location.href = "/orders";
-};
 
   return (
     <main className="cart-page">
@@ -120,8 +172,31 @@ export default function Cart() {
       ) : (
         <div className="cart-layout">
           <section className="cart-list">
+            <div className="cart-shop-header">
+              <label className="select-all-box">
+                <input
+                  type="checkbox"
+                  checked={
+                    cart.length > 0 &&
+                    selectedItems.length === cart.length
+                  }
+                  onChange={toggleSelectAll}
+                />
+                <span>🛍️ NhomTTTN Music</span>
+              </label>
+
+              <strong>{totalItems} sản phẩm đã chọn</strong>
+            </div>
+
             {cart.map((item, index) => (
               <div className="cart-item-card" key={index}>
+                <input
+                  type="checkbox"
+                  className="cart-checkbox"
+                  checked={selectedItems.includes(index)}
+                  onChange={() => toggleSelectItem(index)}
+                />
+
                 <img
                   src={item.image}
                   alt={item.name}
@@ -130,19 +205,27 @@ export default function Cart() {
 
                 <div className="cart-item-info">
                   <h3>{item.name}</h3>
+                  <p className="cart-item-brand">
+                    Chính hãng • Bảo hành uy tín
+                  </p>
                   <p className="cart-item-price">{item.price}</p>
 
                   <div className="quantity-box">
-                    <button onClick={() => decreaseQuantity(index)}>-</button>
+                    <button onClick={() => decreaseQuantity(index)}>
+                      -
+                    </button>
                     <span>{item.quantity || 1}</span>
-                    <button onClick={() => increaseQuantity(index)}>+</button>
+                    <button onClick={() => increaseQuantity(index)}>
+                      +
+                    </button>
                   </div>
                 </div>
 
                 <div className="cart-item-total">
                   <p>
                     {(
-                      getPriceNumber(item.price) * (item.quantity || 1)
+                      getPriceNumber(item.price) *
+                      (item.quantity || 1)
                     ).toLocaleString("vi-VN")}
                     đ
                   </p>
@@ -162,7 +245,7 @@ export default function Cart() {
             <h2>Thông tin đơn hàng</h2>
 
             <div className="summary-row">
-              <span>Tổng sản phẩm</span>
+              <span>Sản phẩm đã chọn</span>
               <strong>{totalItems}</strong>
             </div>
 
@@ -183,7 +266,13 @@ export default function Cart() {
 
             <button
               className="order-btn"
-              onClick={() => setShowCheckout(true)}
+              onClick={() => {
+                if (selectedItems.length === 0) {
+                  alert("Vui lòng chọn sản phẩm cần thanh toán");
+                  return;
+                }
+                setShowCheckout(true);
+              }}
             >
               Đặt Hàng
             </button>
@@ -211,7 +300,10 @@ export default function Cart() {
               placeholder="Họ và tên"
               value={customer.name}
               onChange={(e) =>
-                setCustomer({ ...customer, name: e.target.value })
+                setCustomer({
+                  ...customer,
+                  name: e.target.value,
+                })
               }
             />
 
@@ -220,7 +312,10 @@ export default function Cart() {
               placeholder="Số điện thoại"
               value={customer.phone}
               onChange={(e) =>
-                setCustomer({ ...customer, phone: e.target.value })
+                setCustomer({
+                  ...customer,
+                  phone: e.target.value,
+                })
               }
             />
 
@@ -229,7 +324,10 @@ export default function Cart() {
               placeholder="Địa chỉ nhận hàng"
               value={customer.address}
               onChange={(e) =>
-                setCustomer({ ...customer, address: e.target.value })
+                setCustomer({
+                  ...customer,
+                  address: e.target.value,
+                })
               }
             />
 
@@ -237,9 +335,46 @@ export default function Cart() {
               placeholder="Ghi chú thêm"
               value={customer.note}
               onChange={(e) =>
-                setCustomer({ ...customer, note: e.target.value })
+                setCustomer({
+                  ...customer,
+                  note: e.target.value,
+                })
               }
             />
+
+            <div className="payment-box">
+              <h3>Phương thức thanh toán</h3>
+
+              <label className="payment-option">
+                <input
+                  type="radio"
+                  name="payment"
+                  checked={paymentMethod === "COD"}
+                  onChange={() => setPaymentMethod("COD")}
+                />
+                <span>💵 Thanh toán khi nhận hàng (COD)</span>
+              </label>
+
+              <label className="payment-option">
+                <input
+                  type="radio"
+                  name="payment"
+                  checked={paymentMethod === "Momo"}
+                  onChange={() => setPaymentMethod("Momo")}
+                />
+                <span>🟣 Ví Momo</span>
+              </label>
+
+              <label className="payment-option">
+                <input
+                  type="radio"
+                  name="payment"
+                  checked={paymentMethod === "VNPay"}
+                  onChange={() => setPaymentMethod("VNPay")}
+                />
+                <span>🔵 VNPay / Ngân hàng</span>
+              </label>
+            </div>
 
             <div className="checkout-total-box">
               <span>Tổng thanh toán</span>
@@ -247,7 +382,10 @@ export default function Cart() {
             </div>
 
             <div className="checkout-actions">
-              <button className="confirm-order-btn" onClick={confirmOrder}>
+              <button
+                className="confirm-order-btn"
+                onClick={confirmOrder}
+              >
                 Xác nhận đặt hàng
               </button>
 

@@ -109,30 +109,30 @@ const products = [
   },
 
   // PHỤ KIỆN
-  {
-    id: 13,
-    name: "Dây Đeo Saxophone",
-    brand: "Yamaha",
-    type: "Phụ Kiện",
-    price: 350000,
-    image: "/images/day-deo-saxophone.jpg",
-  },
-  {
-    id: 14,
-    name: "Bộ Vệ Sinh Saxophone",
-    brand: "Conn",
-    type: "Phụ Kiện",
-    price: 450000,
-    image: "/images/bo-ve-sinh-saxophone.jpg",
-  },
-  {
-    id: 15,
-    name: "Reed Alto Saxophone",
-    brand: "Vandoren",
-    type: "Phụ Kiện",
-    price: 250000,
-    image: "/images/reed-alto-saxophone.jpg",
-  },
+{
+  id: 13,
+  name: "Dây Đeo Saxophone",
+  brand: "Yamaha",
+  type: "Phụ Kiện",
+  price: 350000,
+  image: "/images/day-deo-saxophone.jpg",
+},
+{
+  id: 14,
+  name: "Bộ Vệ Sinh Saxophone",
+  brand: "Conn",
+  type: "Phụ Kiện",
+  price: 450000,
+  image: "/images/bo-ve-sinh-saxophone.jpg",
+},
+{
+  id: 15,
+  name: "Reed Alto Saxophone",
+  brand: "Vandoren",
+  type: "Phụ Kiện",
+  price: 250000,
+  image: "/images/reed-alto-saxophone.jpg",
+},
   // YAMAHA
 {
   id: 16,
