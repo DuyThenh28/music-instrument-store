@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 const products = [
@@ -190,7 +191,7 @@ const products = [
 },
 ];
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const q = searchParams.get("q")?.trim().toLowerCase() || "";
 
@@ -238,5 +239,13 @@ export default function ProductsPage() {
         </p>
       )}
     </main>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProductsContent />
+    </Suspense>
   );
 }
