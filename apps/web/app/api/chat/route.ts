@@ -1,50 +1,39 @@
-import OpenAI from "openai";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { LexRuntimeV2Client, RecognizeTextCommand } from "@aws-sdk/client-lex-runtime-v2";
 
-export async function POST(req: Request) {
+// Khởi tạo Client cho Lex V2
+const lexClient = new LexRuntimeV2Client({
+  region: process.env.AWS_REGION || "us-east-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
+export async function POST(req: NextRequest) {
   try {
-    const { message } = await req.json();
+    const { text, sessionId } = await req.json();
 
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { reply: "Thiếu OPENAI_API_KEY trong file .env.local." },
-        { status: 500 }
-      );
-    }
+    // Tham số gửi lên Amazon Lex
+    const params = {
+      botId: process.env.LEX_BOT_ID!,
+      botAliasId: process.env.LEX_BOT_ALIAS_ID!,
+      localeId: "en_US", // Nếu bạn cấu hình bot Tiếng Anh
+      sessionId: sessionId || "default-session", // SessionId định danh cuộc hội thoại
+      text: text,
+    };
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-    console.log("API KEY:", process.env.OPENAI_API_KEY);
+    const command = new RecognizeTextCommand(params);
+    const response = await lexClient.send(command);
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "Bạn là nhân viên tư vấn bán Saxophone chuyên nghiệp của NhomTTTN Music. Trả lời ngắn gọn, thân thiện, bằng tiếng Việt.",
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-    });
-
-    return NextResponse.json({
-      reply:
-        completion.choices[0].message.content ||
-        "Xin lỗi, tôi chưa có câu trả lời phù hợp.",
-    });
+    // Bóc tách text trả về từ Lex Bot
+    const messages = response.messages?.map((msg) => msg.content) || [];
+    
+    return NextResponse.json({ messages });
   } catch (error) {
-    console.error("Lỗi API Chat:", error);
-
+    console.error("Lex Error:", error);
     return NextResponse.json(
-      {
-        reply:
-          "AI chưa kết nối được. Hãy kiểm tra API key, tài khoản OpenAI API hoặc terminal.",
-      },
+      { error: "Không thể kết nối đến Bot trợ lý lúc này." }, 
       { status: 500 }
     );
   }

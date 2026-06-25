@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-amplify/auth": "^6.20.0",
+    "@aws-sdk/client-lambda": "^3.1075.0",
+    "@aws-sdk/client-lex-runtime-v2": "^3.1075.0",
     "@swc/helpers": "^0.5.23",
     "next": "16.2.7",
     "openai": "^6.44.0",
