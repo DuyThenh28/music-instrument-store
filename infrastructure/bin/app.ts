@@ -1,17 +1,20 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
+import { SecurityStack } from '../lib/security-stack';
 
-// Chúng ta sẽ tạo các file này trong thư mục lib/ ở các bước sau
+// Additional stacks can be imported here as they are implemented.
 // import { DatabaseStack } from '../lib/database-stack';
 // import { AuthStack } from '../lib/auth-stack';
 
 const app = new cdk.App();
 
-// Khởi tạo biến môi trường (Lấy từ tag deploy hoặc mặc định là 'dev')
+// Resolve the deployment environment from CDK context, defaulting to dev.
 const envName = app.node.tryGetContext('env') || 'dev';
 
-// Tạm thời comment lại, chúng ta sẽ mở ra khi viết xong code cho từng phần
+new SecurityStack(app, `MusicStoreSecurityStack-${envName}`);
+
+// Enable these stacks after their implementations are added.
 /*
 const databaseStack = new DatabaseStack(app, `MusicStoreDatabaseStack-${envName}`, {
   envName,
