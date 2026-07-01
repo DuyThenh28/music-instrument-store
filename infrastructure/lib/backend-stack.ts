@@ -109,6 +109,7 @@ export class BackendStack extends cdk.Stack {
       code: lambda.Code.fromAsset("../services/checkout-service"),
       environment: {
         STRIPE_SECRET_KEY: props.stripeSecrets.secretValueFromJson("STRIPE_SECRET_KEY").toString(),
+        TABLE_NAME: props.productsTable.tableName,
       },
       tracing: lambda.Tracing.ACTIVE,
       logRetention: logs.RetentionDays.ONE_WEEK,
@@ -147,6 +148,7 @@ export class BackendStack extends cdk.Stack {
       environment: {
         STRIPE_WEBHOOK_SECRET: props.stripeSecrets.secretValueFromJson("STRIPE_WEBHOOK_SECRET").toString(),
         EVENT_BUS_NAME: eventBus.eventBusName,
+        TABLE_NAME: props.productsTable.tableName,
       },
       tracing: lambda.Tracing.ACTIVE,
       logRetention: logs.RetentionDays.ONE_WEEK,
@@ -187,6 +189,8 @@ export class BackendStack extends cdk.Stack {
     // 6. Cấp quyền IAM cho các tài nguyên
     props.productsTable.grantReadWriteData(productApiLambda);
     props.productsTable.grantReadWriteData(orderProcessingLambda); // Order Processor cần ghi DynamoDB
+    props.productsTable.grantReadWriteData(checkoutApiLambda); // Checkout API cần cập nhật kho sản phẩm
+    props.productsTable.grantReadWriteData(paymentWebhookLambda); // Payment Webhook cần cập nhật kho sản phẩm
     props.productsBucket.grantReadWrite(productApiLambda);
     props.stripeSecrets.grantRead(checkoutApiLambda);
     props.stripeSecrets.grantRead(paymentWebhookLambda);

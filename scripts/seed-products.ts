@@ -186,10 +186,13 @@ const seedProducts = async () => {
 
   const now = new Date().toISOString();
   const products = readProducts();
-  const items: ProductItem[] = products.map((product) => {
+  const items: any[] = [];
+  
+  products.forEach((product) => {
     const id = String(product.id);
 
-    return {
+    // 1. Metadata Record
+    items.push({
       PK: `PRODUCT#${id}`,
       SK: "METADATA",
       id,
@@ -201,7 +204,18 @@ const seedProducts = async () => {
       description: product.description,
       createdAt: now,
       updatedAt: now,
-    };
+    });
+
+    // 2. Inventory Record
+    items.push({
+      PK: `PRODUCT#${id}`,
+      SK: "INVENTORY",
+      productId: id,
+      stock: 10, // Khởi tạo 10 sản phẩm trong kho
+      reserved: 0,
+      location: "WAREHOUSE_DEV_01",
+      updatedAt: now,
+    });
   });
 
   const client = DynamoDBDocumentClient.from(
