@@ -7135,7 +7135,12 @@ var Stripe = createStripe(new NodePlatformFunctions());
 var stripe_esm_node_default = Stripe;
 
 // services/checkout-service/index.ts
+var import_client_dynamodb = require("@aws-sdk/client-dynamodb");
+var import_lib_dynamodb = require("@aws-sdk/lib-dynamodb");
 var stripeSecretKey = process.env.STRIPE_SECRET_KEY || "";
+var tableName = process.env.TABLE_NAME || "";
+var ddbClient = new import_client_dynamodb.DynamoDBClient({});
+var ddbDocClient = import_lib_dynamodb.DynamoDBDocumentClient.from(ddbClient);
 var corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type,Authorization",
@@ -7167,6 +7172,47 @@ var handler = async (event) => {
       0
     );
     const resolvedIdempotencyKey = idempotencyKey || `idemp_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+    if (tableName) {
+      const transactItems = items.map((item) => {
+        const qty = item.quantity || 1;
+        const productId = String(item.productId);
+        return {
+          Update: {
+            TableName: tableName,
+            Key: {
+              PK: `PRODUCT#${productId}`,
+              SK: "INVENTORY"
+            },
+            UpdateExpression: "SET stock = stock - :qty, reserved = reserved + :qty, updatedAt = :now",
+            ConditionExpression: "stock >= :qty",
+            ExpressionAttributeValues: {
+              ":qty": qty,
+              ":now": (/* @__PURE__ */ new Date()).toISOString()
+            }
+          }
+        };
+      });
+      try {
+        await ddbDocClient.send(
+          new import_lib_dynamodb.TransactWriteCommand({
+            TransactItems: transactItems
+          })
+        );
+        console.log(`Successfully reserved inventory for items. Idempotency Key: ${resolvedIdempotencyKey}`);
+      } catch (error) {
+        console.error("Inventory reservation failed:", error);
+        if (error.name === "TransactionCanceledException" || error.message?.includes("ConditionalCheckFailed")) {
+          return jsonResponse(400, {
+            message: "M\u1ED9t ho\u1EB7c nhi\u1EC1u s\u1EA3n ph\u1EA9m \u0111\xE3 h\u1EBFt h\xE0ng ho\u1EB7c kh\xF4ng \u0111\u1EE7 s\u1ED1 l\u01B0\u1EE3ng t\u1ED3n kho. Vui l\xF2ng ki\u1EC3m tra l\u1EA1i gi\u1ECF h\xE0ng!",
+            error: "InventoryConflict"
+          });
+        }
+        return jsonResponse(500, {
+          message: "L\u1ED7i h\u1EC7 th\u1ED1ng khi x\u1EED l\xFD t\u1ED3n kho \u0111\u01A1n h\xE0ng.",
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+    }
     const isMockStripe = !stripeSecretKey || stripeSecretKey === "TO_BE_REPLACED_IN_CONSOLE" || stripeSecretKey.startsWith("dummy");
     if (isMockStripe) {
       console.log(`Stripe key is not configured or mock. Returning mock client secret. Idempotency Key: ${resolvedIdempotencyKey}`);

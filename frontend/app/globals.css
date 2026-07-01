@@ -1219,6 +1219,53 @@ button {
   border-color: var(--color-secondary);
 }
 
+/* ADDRESS SELECTOR STYLES */
+.address-selector-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.address-dropdowns-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.address-select {
+  width: 100%;
+  padding: 12px 8px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--rounded-sm);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  outline: none;
+  background-color: white;
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+.address-select:focus {
+  border-color: var(--color-secondary);
+}
+
+.address-detail-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--rounded-sm);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  outline: none;
+  background-color: white;
+}
+
+.address-detail-input:focus {
+  border-color: var(--color-secondary);
+}
+
 .payment-box {
   margin: 1.5rem 0;
 }

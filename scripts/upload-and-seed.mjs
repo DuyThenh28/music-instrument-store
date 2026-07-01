@@ -149,11 +149,13 @@ async function run() {
   const now = new Date().toISOString();
   
   const ddbClient = DynamoDBDocumentClient.from(new DynamoDBClient({ region }));
-  const items = catalog.map((product) => {
+  const items = [];
+  catalog.forEach((product) => {
     const filename = path.basename(product.imagePath);
     const s3Url = `https://${s3BucketName}.s3.${region}.amazonaws.com/products/${filename}`;
     
-    return {
+    // 1. Bản ghi thông tin chi tiết sản phẩm
+    items.push({
       PK: `PRODUCT#${product.id}`,
       SK: "METADATA",
       id: String(product.id),
@@ -165,7 +167,18 @@ async function run() {
       description: product.description,
       createdAt: now,
       updatedAt: now,
-    };
+    });
+
+    // 2. Bản ghi quản lý kho (Inventory)
+    items.push({
+      PK: `PRODUCT#${product.id}`,
+      SK: "INVENTORY",
+      productId: String(product.id),
+      stock: 10, // Khởi tạo 10 sản phẩm trong kho cho môi trường dev
+      reserved: 0,
+      location: "WAREHOUSE_DEV_01",
+      updatedAt: now,
+    });
   });
 
   const writeBatch = async (requests) => {

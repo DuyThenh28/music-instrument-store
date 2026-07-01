@@ -1,7 +1,14 @@
 import type { APIGatewayProxyHandler, APIGatewayProxyResult } from "aws-lambda";
 import Stripe from "stripe";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "";
+const tableName = process.env.TABLE_NAME || "";
+
+const ddbClient = new DynamoDBClient({});
+const ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type,Authorization",
@@ -47,6 +54,53 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     // Sinh idempotency key nếu client không gửi lên
     const resolvedIdempotencyKey = idempotencyKey || `idemp_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+
+    // Thực hiện giữ chỗ tồn kho (Inventory Reservation) bằng TransactWrite
+    if (tableName) {
+      const transactItems = items.map((item: { productId: string | number; quantity?: number }) => {
+        const qty = item.quantity || 1;
+        const productId = String(item.productId);
+        return {
+          Update: {
+            TableName: tableName,
+            Key: {
+              PK: `PRODUCT#${productId}`,
+              SK: "INVENTORY",
+            },
+            UpdateExpression: "SET stock = stock - :qty, reserved = reserved + :qty, updatedAt = :now",
+            ConditionExpression: "stock >= :qty",
+            ExpressionAttributeValues: {
+              ":qty": qty,
+              ":now": new Date().toISOString(),
+            },
+          },
+        };
+      });
+
+      try {
+        await ddbDocClient.send(
+          new TransactWriteCommand({
+            TransactItems: transactItems,
+          })
+        );
+        console.log(`Successfully reserved inventory for items. Idempotency Key: ${resolvedIdempotencyKey}`);
+      } catch (error: any) {
+        console.error("Inventory reservation failed:", error);
+        
+        // Trả về lỗi chi tiết nếu kiểm tra điều kiện thất bại (hết hàng)
+        if (error.name === "TransactionCanceledException" || error.message?.includes("ConditionalCheckFailed")) {
+          return jsonResponse(400, {
+            message: "Một hoặc nhiều sản phẩm đã hết hàng hoặc không đủ số lượng tồn kho. Vui lòng kiểm tra lại giỏ hàng!",
+            error: "InventoryConflict",
+          });
+        }
+        
+        return jsonResponse(500, {
+          message: "Lỗi hệ thống khi xử lý tồn kho đơn hàng.",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
 
     // Kiểm tra Stripe Secret Key xem có hợp lệ không
     const isMockStripe =

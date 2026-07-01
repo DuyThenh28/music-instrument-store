@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Amplify } from "@aws-amplify/core";
+import { Amplify } from "aws-amplify";
+
 
 if (!process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || !process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID) {
   console.warn(

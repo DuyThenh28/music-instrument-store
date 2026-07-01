@@ -4,8 +4,8 @@ import "../components/AmplifyConfig";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { fetchAuthSession, getCurrentUser } from "@aws-amplify/auth";
+import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+import AddressSelector from "../components/AddressSelector";
 
 type UserProfile = {
   userId: string;
@@ -32,7 +32,6 @@ const currencyFormatter = new Intl.NumberFormat("vi-VN", {
 });
 
 export default function ProfilePage() {
-  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
@@ -46,20 +45,6 @@ export default function ProfilePage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setIsAuthenticated(true);
-        await fetchData();
-      } catch (err) {
-        console.error("Auth check failed:", err);
-        setIsAuthenticated(false);
-      }
-    };
-    init();
-  }, []);
 
   const fetchData = async () => {
     setIsLoadingData(true);
@@ -100,6 +85,20 @@ export default function ProfilePage() {
       setIsLoadingData(false);
     }
   };
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await getCurrentUser();
+        setIsAuthenticated(true);
+        await fetchData();
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        setIsAuthenticated(false);
+      }
+    };
+    init();
+  }, []);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -291,14 +290,10 @@ export default function ProfilePage() {
                     <label htmlFor="address" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                       Địa chỉ nhận hàng mặc định
                     </label>
-                    <textarea
-                      id="address"
-                      rows={3}
-                      required
+                    <AddressSelector
                       value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      placeholder="123 Đường ABC, Quận X, TP. Hồ Chí Minh"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-900 focus:border-emerald-900 transition-all"
+                      onChange={(val) => setFormData({ ...formData, address: val })}
+                      disabled={isSubmitting}
                     />
                   </div>
 
