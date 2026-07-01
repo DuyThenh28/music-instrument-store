@@ -1,6 +1,7 @@
 "use client";
 
 import type { Customer } from "../../types/cart";
+import AddressSelector from "./AddressSelector";
 
 interface CheckoutModalProps {
   customer: Customer;
@@ -51,11 +52,9 @@ export function CheckoutModal({
           disabled={isSubmitting}
         />
 
-        <input
-          type="text"
-          placeholder="Địa chỉ nhận hàng"
+        <AddressSelector
           value={customer.address}
-          onChange={(e) => updateField("address", e.target.value)}
+          onChange={(val) => updateField("address", val)}
           disabled={isSubmitting}
         />
 
