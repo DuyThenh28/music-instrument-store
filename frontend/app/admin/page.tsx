@@ -509,7 +509,7 @@ export default function AdminPage() {
                           <td className="p-4 font-semibold text-slate-800">{user.name || "Chưa cập nhật"}</td>
                           <td className="p-4">{user.email}</td>
                           <td className="p-4">{user.phone || "Chưa cập nhật"}</td>
-                          <td className="p-4 max-w-[200px] truncate">{user.address || "Chưa cập nhật"}</td>
+                          <td className="p-4 max-w-50 truncate">{user.address || "Chưa cập nhật"}</td>
                           <td className="p-4">
                             <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                               user.role === "Admin" ? "bg-rose-50 text-rose-600 border border-rose-100" :
