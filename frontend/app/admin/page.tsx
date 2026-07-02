@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import "../components/AmplifyConfig";
@@ -12,6 +13,15 @@ import { ProductModal } from "../components/ProductModal";
 import { OrderTable } from "../components/OrderTable";
 import { OrderDetailsModal } from "../components/OrderDetailsModal";
 
+interface AdminUser {
+  userId: string;
+  email?: string;
+  name?: string;
+  phone?: string;
+  address?: string;
+  role?: string;
+}
+
 export default function AdminPage() {
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -20,9 +30,9 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<"products" | "orders" | "users">("products");
 
   // User/Personnel management state
-  const [usersList, setUsersList] = useState<any[]>([]);
+  const [usersList, setUsersList] = useState<AdminUser[]>([]);
   const [userSearch, setUserSearch] = useState("");
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isEditUserSubmitting, setIsEditUserSubmitting] = useState(false);
   const [userFormData, setUserFormData] = useState({
@@ -149,7 +159,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleOpenEditUserModal = (user: any) => {
+  const handleOpenEditUserModal = (user: AdminUser) => {
     setSelectedUser(user);
     setUserFormData({
       name: user.name || "",

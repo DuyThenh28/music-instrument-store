@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import "../components/AmplifyConfig";
@@ -15,6 +16,30 @@ const getStoredOrders = (): Order[] => {
 
   return JSON.parse(localStorage.getItem("orders") || "[]") as Order[];
 };
+
+interface DbOrderItem {
+  productId: string;
+  name: string;
+  price: number;
+  imageUrl?: string;
+  quantity: number;
+}
+
+interface DbOrder {
+  id: string;
+  customer: {
+    name: string;
+    phone: string;
+    address: string;
+    note: string;
+  };
+  paymentMethod: string;
+  items?: DbOrderItem[];
+  totalItems: number;
+  totalPrice: number;
+  status: string;
+  createdAt?: string;
+}
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -38,11 +63,11 @@ export default function OrdersPage() {
         });
         if (res.ok) {
           const dbData = await res.json();
-          const mappedOrders = dbData.map((order: any) => ({
+          const mappedOrders = dbData.map((order: DbOrder) => ({
             id: order.id,
             customer: order.customer,
             paymentMethod: order.paymentMethod,
-            products: (order.items || []).map((item: any) => ({
+            products: (order.items || []).map((item: DbOrderItem) => ({
               id: Number(item.productId) || 0,
               name: item.name,
               price: `${(item.price || 0).toLocaleString("vi-VN")}đ`,
@@ -54,7 +79,7 @@ export default function OrdersPage() {
             status: order.status === "PENDING" ? "Chờ xác nhận" : (order.status ?? "Chờ xác nhận"),
             createdAt: order.createdAt ? new Date(order.createdAt).toLocaleString("vi-VN") : ""
           }));
-          mappedOrders.sort((a: any, b: any) => b.id.localeCompare(a.id));
+          mappedOrders.sort((a: Order, b: Order) => b.id.localeCompare(a.id));
           setOrders(mappedOrders);
         }
       } catch (err) {

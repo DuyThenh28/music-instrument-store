@@ -9,6 +9,30 @@ import AddressSelector from "../components/AddressSelector";
 import { OrderCard } from "../components/OrderCard";
 import type { Order } from "../../types/cart";
 
+interface DbOrderItem {
+  productId: string;
+  name: string;
+  price: number;
+  imageUrl?: string;
+  quantity: number;
+}
+
+interface DbOrder {
+  id: string;
+  customer: {
+    name: string;
+    phone: string;
+    address: string;
+    note: string;
+  };
+  paymentMethod: string;
+  items?: DbOrderItem[];
+  totalItems: number;
+  totalPrice: number;
+  status: string;
+  createdAt?: string;
+}
+
 type UserProfile = {
   userId: string;
   email: string;
@@ -108,11 +132,11 @@ export default function ProfilePage() {
       });
       if (ordersRes.ok) {
         const ordersData = await ordersRes.json();
-        const mappedOrders = ordersData.map((order: any) => ({
+        const mappedOrders = ordersData.map((order: DbOrder) => ({
           id: order.id,
           customer: order.customer,
           paymentMethod: order.paymentMethod,
-          products: (order.items || []).map((item: any) => ({
+          products: (order.items || []).map((item: DbOrderItem) => ({
             id: Number(item.productId) || 0,
             name: item.name,
             price: `${(item.price || 0).toLocaleString("vi-VN")}đ`,
@@ -124,7 +148,7 @@ export default function ProfilePage() {
           status: order.status === "PENDING" ? "Chờ xác nhận" : (order.status ?? "Chờ xác nhận"),
           createdAt: order.createdAt ? new Date(order.createdAt).toLocaleString("vi-VN") : ""
         }));
-        mappedOrders.sort((a: any, b: any) => b.id.localeCompare(a.id));
+        mappedOrders.sort((a: Order, b: Order) => b.id.localeCompare(a.id));
         setOrders(mappedOrders);
       } else {
         const local = localStorage.getItem("orders");
@@ -204,9 +228,10 @@ export default function ProfilePage() {
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Change password error:", err);
-      alert(err.message || "Đã xảy ra lỗi khi đổi mật khẩu.");
+      const errMsg = err instanceof Error ? err.message : "Đã xảy ra lỗi khi đổi mật khẩu.";
+      alert(errMsg);
     } finally {
       setIsChangingPassword(false);
     }
