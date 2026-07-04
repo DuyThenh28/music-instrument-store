@@ -20,6 +20,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Thiếu text hoặc sessionId" }, { status: 400 });
     }
 
+    // Chuẩn hóa và làm sạch dữ liệu đầu vào tránh giá trị "undefined" hoặc "null"
+    let clientName = userName;
+    if (!clientName || clientName === "undefined" || clientName === "null" || clientName === "") {
+      clientName = "Khách";
+    }
+
+    let clientEmail = userEmail;
+    if (!clientEmail || clientEmail === "undefined" || clientEmail === "null" || clientEmail === "") {
+      clientEmail = "guest";
+    }
+
     if (sender === "STAFF") {
       const timestamp = Date.now();
       const staffMessageId = `msg-${timestamp}-${Math.random().toString(36).substring(5)}`;
@@ -79,8 +90,8 @@ export async function POST(req: NextRequest) {
       // Nếu chưa có session, tạo mới với trạng thái mặc định là BOT
       session = {
         ...sessionKey,
-        userId: userEmail || "guest",
-        userName: userName || "Khách",
+        userId: clientEmail,
+        userName: clientName,
         status: "BOT",
         createdAt: now,
         updatedAt: now,
@@ -103,8 +114,8 @@ export async function POST(req: NextRequest) {
       PK: `CHAT#SESSION#${sessionId}`,
       SK: `MSG#${timestamp}#${userMessageId}`,
       sender: "USER",
-      senderId: userEmail || "guest",
-      senderName: userName || "Khách",
+      senderId: clientEmail,
+      senderName: clientName,
       text: text,
       createdAt: now,
     };
@@ -187,8 +198,8 @@ export async function POST(req: NextRequest) {
       text: text,
       sessionState: {
         sessionAttributes: {
-          userName: userName || "Khách",
-          userEmail: userEmail || "",
+          userName: clientName,
+          userEmail: clientEmail === "guest" ? "" : clientEmail,
         }
       }
     };
@@ -210,7 +221,7 @@ export async function POST(req: NextRequest) {
     // 5. Fulfillment Hook tại Next.js API (Nâng cấp hệ thống AI)
     const matchedIntent = lexResponse.sessionState?.intent?.name;
     
-    if (matchedIntent === "TrackOrder" && userEmail) {
+    if (matchedIntent === "TrackOrder" && clientEmail !== "guest") {
       // Tự động kiểm tra đơn hàng gần nhất của User trong DynamoDB
       try {
         const orderQuery = await ddbDocClient.send(
@@ -219,7 +230,7 @@ export async function POST(req: NextRequest) {
             IndexName: "GSI1",
             KeyConditionExpression: "GSI1PK = :gsi1pk AND begins_with(GSI1SK, :orderPrefix)",
             ExpressionAttributeValues: {
-              ":gsi1pk": `USER#${userEmail}`,
+              ":gsi1pk": `USER#${clientEmail}`,
               ":orderPrefix": "ORDER#",
             },
             ScanIndexForward: false, // Lấy đơn hàng mới nhất trước
