@@ -25,6 +25,7 @@ module.exports = __toCommonJS(index_exports);
 var import_client_dynamodb = require("@aws-sdk/client-dynamodb");
 var import_lib_dynamodb = require("@aws-sdk/lib-dynamodb");
 var import_client_eventbridge = require("@aws-sdk/client-eventbridge");
+var import_node_crypto = require("node:crypto");
 var dynamoDb = import_lib_dynamodb.DynamoDBDocumentClient.from(new import_client_dynamodb.DynamoDBClient({}));
 var tableName = process.env.TABLE_NAME;
 var eventBridge = new import_client_eventbridge.EventBridgeClient({});
@@ -462,27 +463,37 @@ var handler = async (event) => {
         }
       }
       if (eventBusName) {
+        const isCancellation = status === "\u0110\xE3 h\u1EE7y";
+        const detailType = isCancellation ? "OrderCancelled" : "OrderUpdated";
         try {
-          console.log(`Publishing OrderUpdated event for order ${targetOrderId} to ${eventBusName}...`);
+          console.log(`Publishing ${detailType} event for order ${targetOrderId} to ${eventBusName}...`);
           await eventBridge.send(
             new import_client_eventbridge.PutEventsCommand({
               Entries: [
                 {
                   EventBusName: eventBusName,
                   Source: "com.musicstore.order",
-                  DetailType: "OrderUpdated",
+                  DetailType: detailType,
                   Detail: JSON.stringify({
+                    eventId: (0, import_node_crypto.randomUUID)(),
+                    version: "1.0",
                     orderId: targetOrderId,
+                    email: order.email,
                     customer: order.customer,
                     status,
-                    totalPrice: order.totalPrice
+                    totalPrice: order.totalPrice,
+                    ...isCancellation && {
+                      reason: reason || "",
+                      cancelledBy: changedBy,
+                      items: order.items
+                    }
                   })
                 }
               ]
             })
           );
         } catch (err) {
-          console.error("Failed to publish OrderUpdated event to EventBridge", err);
+          console.error(`Failed to publish ${detailType} event to EventBridge`, err);
         }
       }
       return jsonResponse(200, stripTableKeys(updatedOrder));

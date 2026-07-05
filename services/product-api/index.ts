@@ -10,6 +10,7 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge";
+import { randomUUID } from "node:crypto";
 
 type ProductItem = {
   PK?: string;
@@ -576,27 +577,37 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
       // Gửi sự kiện cập nhật trạng thái đơn hàng sang EventBridge để kích hoạt gửi Mail tự động
       if (eventBusName) {
+        const isCancellation = status === "Đã hủy";
+        const detailType = isCancellation ? "OrderCancelled" : "OrderUpdated";
         try {
-          console.log(`Publishing OrderUpdated event for order ${targetOrderId} to ${eventBusName}...`);
+          console.log(`Publishing ${detailType} event for order ${targetOrderId} to ${eventBusName}...`);
           await eventBridge.send(
             new PutEventsCommand({
               Entries: [
                 {
                   EventBusName: eventBusName,
                   Source: "com.musicstore.order",
-                  DetailType: "OrderUpdated",
+                  DetailType: detailType,
                   Detail: JSON.stringify({
+                    eventId: randomUUID(),
+                    version: "1.0",
                     orderId: targetOrderId,
+                    email: order.email,
                     customer: order.customer,
                     status: status,
                     totalPrice: order.totalPrice,
+                    ...(isCancellation && {
+                      reason: reason || "",
+                      cancelledBy: changedBy,
+                      items: order.items,
+                    }),
                   }),
                 },
               ],
             })
           );
         } catch (err) {
-          console.error("Failed to publish OrderUpdated event to EventBridge", err);
+          console.error(`Failed to publish ${detailType} event to EventBridge`, err);
         }
       }
 
