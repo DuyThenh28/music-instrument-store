@@ -88,6 +88,7 @@ var handler = async (event) => {
                 DetailType: "OrderPlaced",
                 Detail: JSON.stringify({
                   orderId,
+                  email: order.email,
                   customer: order.customer,
                   totalPrice: order.totalPrice,
                   totalItems: order.totalItems,
